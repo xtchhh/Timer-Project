@@ -9,7 +9,9 @@ public class TestMove : MonoBehaviour
     private CharacterController characterController;
     public InputSystem_Actions inputActions;
     private float gravity = -9.41f;
-    private float gravityMultiplier = 1.75f;
+    private int health = 2;
+    public int damage;
+    //private float gravityMultiplier = 1.75f;
     private bool grounded;
     private Vector3 velocity;
     private Vector2 move; //x, y
@@ -56,7 +58,13 @@ public class TestMove : MonoBehaviour
 
             if (hit.point.y >= 1f)
             {
-                Destroy(this.gameObject);
+                health -= damage;
+                Debug.Log(health);
+
+                if (health <= 0)
+                {
+                    Destroy(this.gameObject);
+                }
             }
         }
         catch (NullReferenceException ex)
