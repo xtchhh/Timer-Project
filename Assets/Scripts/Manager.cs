@@ -1,21 +1,25 @@
 using UnityEngine;
+using UnityEngine.LightTransport;
 
 public class Manager : MonoBehaviour
 {
     public GameObject player;
-    private float objectiveTime = 15f;
+    public GameObject objective;
+    public GameObject pickup;
+    public static float objectiveTime = 15f;
     private float endDistance = 5f;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        InvokeRepeating("SpawnPickup", 3.0f, 3.0f);
     }
 
     // Update is called once per frame
     void Update()
     {
-        float distanceToPlayer = Vector3.Distance(this.gameObject.transform.position, player.transform.position);
+        Debug.Log(player.transform.position);
+        float distanceToPlayer = Vector3.Distance(objective.gameObject.transform.position, player.transform.position);
 
         if (distanceToPlayer < endDistance)
         {
@@ -24,7 +28,15 @@ public class Manager : MonoBehaviour
 
         if (Time.time >= objectiveTime)
         {
-            //Debug.Log("Game Over because you ran out of time");
+            Debug.Log("Game Over because you ran out of time");
         }
+    }
+
+    void SpawnPickup()
+    {
+        float randomX = Random.Range(145, 5);
+        float randomZ = Random.Range(980, 15);
+
+        Instantiate(pickup, new Vector3(randomX, 1, randomZ), Quaternion.identity);
     }
 }

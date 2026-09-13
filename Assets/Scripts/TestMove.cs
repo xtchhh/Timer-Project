@@ -88,7 +88,7 @@ public class TestMove : MonoBehaviour
             currentRot = Quaternion.Slerp(transform.rotation, currentRot, Time.deltaTime * 2.5f);
         }
 
-        Debug.Log($"{rightDir.x} + {rightDir.sqrMagnitude}");
+        //Debug.Log($"{rightDir.x} + {rightDir.sqrMagnitude}");
     }
 
     void OnControllerColliderHit(ControllerColliderHit hit)
