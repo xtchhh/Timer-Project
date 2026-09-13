@@ -35,7 +35,7 @@ public class Manager : MonoBehaviour
     void SpawnPickup()
     {
         float randomX = Random.Range(145, 5);
-        float randomZ = Random.Range(980, 15);
+        float randomZ = Random.Range(980, 30);
 
         Instantiate(pickup, new Vector3(randomX, 1, randomZ), Quaternion.identity);
     }

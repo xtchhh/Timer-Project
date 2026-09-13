@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -13,6 +14,7 @@ public class TestMove : MonoBehaviour
     public int damage;
     //private float gravityMultiplier = 1.75f;
     private bool grounded;
+    private bool canUseAbility = true;
     private Vector3 velocity;
     private Vector2 move; //x, y
 
@@ -33,18 +35,34 @@ public class TestMove : MonoBehaviour
 
     void Movement()
     {
-        Vector3 Xinput = Vector3.zero;
-
         move = inputActions.Player.Move.ReadValue<Vector2>();
 
         Vector3 cameraForward = cam.transform.forward;
         cameraForward.y = 0;
+        cameraForward = cameraForward.normalized;
         float forwardInput = move.y;
 
-        Vector3 forwardDirection = cameraForward.normalized * forwardInput;
-        Vector3 direction = (forwardDirection * moveSpeed) + (velocity.y * Vector3.up);
+        //Vector3 forwardDirection = cameraForward * forwardInput;
 
+        if (move.sqrMagnitude > 0.1)
+        {
+            moveSpeed = 40.0f;
+
+            if (move.y == -1)
+            {
+                moveSpeed = 5.0f;
+            }
+        }
+        else
+        {
+            moveSpeed = 15.0f;
+        }
+
+        Vector3 direction = (cameraForward * moveSpeed) + (velocity.y * Vector3.up);
         characterController.Move(direction * Time.deltaTime);
+
+        /////////////////////////////////////////////////////////////////////////////////////
+        Vector3 Xinput = Vector3.zero;
 
         if (Keyboard.current.dKey.isPressed)
         {
