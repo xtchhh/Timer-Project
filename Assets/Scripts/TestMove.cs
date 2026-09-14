@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -8,13 +6,13 @@ public class TestMove : MonoBehaviour
     public Camera cam;
     private CharacterController characterController;
     public InputSystem_Actions inputActions;
+    public GameObject explosion;
     public float moveSpeed;
     private float gravity = -9.41f;
     private int health = 2;
     public int damage;
     //private float gravityMultiplier = 1.75f;
     private bool grounded;
-    private bool canUseAbility = true;
     private Vector3 velocity;
     private Vector2 move; //x, y
 
@@ -24,6 +22,11 @@ public class TestMove : MonoBehaviour
         characterController = GetComponent<CharacterController>();
         inputActions = new InputSystem_Actions();
         inputActions.Enable();
+    }
+
+    void OnDisable()
+    {
+        inputActions.Disable();
     }
 
     // Update is called once per frame
@@ -40,9 +43,6 @@ public class TestMove : MonoBehaviour
         Vector3 cameraForward = cam.transform.forward;
         cameraForward.y = 0;
         cameraForward = cameraForward.normalized;
-        float forwardInput = move.y;
-
-        //Vector3 forwardDirection = cameraForward * forwardInput;
 
         if (move.sqrMagnitude > 0.1)
         {
@@ -80,6 +80,7 @@ public class TestMove : MonoBehaviour
 
     void BikeRotation(Vector3 dir, Vector3 rightDir)
     {
+        /*
         Vector3 cameraRight = cam.transform.right;
         cameraRight = cameraRight.normalized;
         cameraRight.y = 0;
@@ -87,13 +88,15 @@ public class TestMove : MonoBehaviour
         Vector3 rightDirection = cameraRight * rightDir.x;
 
         float aroundZleft = rightDirection.x * -45.0f;
+        */
 
         Quaternion orignalRotation = Quaternion.identity;
-        Quaternion currentRot = Quaternion.Euler(0, 0, 0);
-
         Quaternion target = Quaternion.LookRotation(dir);
-        transform.rotation = target * currentRot;
+        Quaternion currentRotation = Quaternion.Slerp(this.transform.rotation, target, Time.deltaTime * 15.0f);
 
+        transform.rotation = currentRotation;
+
+        /*
         if (rightDir.sqrMagnitude > 0.1)
         {
             Quaternion localRot = Quaternion.Euler(0, 0, aroundZleft);
@@ -107,29 +110,16 @@ public class TestMove : MonoBehaviour
         }
 
         //Debug.Log($"{rightDir.x} + {rightDir.sqrMagnitude}");
+        */
     }
 
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        try
+        if (hit.point.y >= 1f)
         {
-            //Debug.Log("Hit: " + hit.point);
-
-            if (hit.point.y >= 1f)
-            {
-                health -= damage;
-                Debug.Log(health);
-
-                if (health <= 0)
-                {
-                    Destroy(this.gameObject);
-                }
-            }
+            this.gameObject.SetActive(false);
+            Instantiate(explosion, hit.point, Quaternion.identity);
         }
-        catch (NullReferenceException ex)
-        {
-            Debug.Log($"Object was destroyed, this was the error: {ex}"); // not functional because object is destroyed
-        }  
     }
 
     void Gravity()
@@ -152,5 +142,4 @@ public class TestMove : MonoBehaviour
             */
         }
     }
-
 }

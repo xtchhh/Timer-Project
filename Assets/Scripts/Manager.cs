@@ -1,5 +1,8 @@
+using System;
+using System.Collections;
+using Random = UnityEngine.Random;
 using UnityEngine;
-using UnityEngine.LightTransport;
+using UnityEngine.SceneManagement;
 
 public class Manager : MonoBehaviour
 {
@@ -18,20 +21,47 @@ public class Manager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(player.transform.position);
-        float distanceToPlayer = Vector3.Distance(objective.gameObject.transform.position, player.transform.position);
+        ObjectiveDistance();
+        DestroyCheck();
+    }
 
-        if (distanceToPlayer < endDistance)
+    void ObjectiveDistance()
+    {
+        try
         {
-            Debug.Log($"Game Over because you reached objective, you won at {Time.time} seconds");
+            Debug.Log($"{Time.time} + {objectiveTime}");
+            float distanceToPlayer = Vector3.Distance(objective.gameObject.transform.position, player.transform.position);
+
+            if (distanceToPlayer < endDistance)
+            {
+                Debug.Log($"Game Over because you reached objective, you won at {Time.time} seconds");
+            }
+
+            if (Time.time >= objectiveTime)
+            {
+                Debug.Log("Game Over because you ran out of time");
+            }
         }
-
-        if (Time.time >= objectiveTime)
+        catch (NullReferenceException ex)
         {
-            Debug.Log("Game Over because you ran out of time");
+            Debug.Log($"Player no longer exists, this your error: {ex}");
         }
     }
 
+    void DestroyCheck()
+    {
+        if (!player.activeInHierarchy)
+        {
+            StartCoroutine(SwitchScene());
+        }
+    }
+
+    IEnumerator SwitchScene()
+    {
+        yield return new WaitForSeconds(3.0f);
+
+        SceneManager.LoadScene("Menu");
+    }
     void SpawnPickup()
     {
         float randomX = Random.Range(145, 5);

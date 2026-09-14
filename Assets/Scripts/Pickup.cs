@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Pickup : MonoBehaviour
@@ -14,15 +15,22 @@ public class Pickup : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        this.transform.LookAt(player.transform);
-
-        float distanceToPlayer = Vector3.Distance(this.transform.position, player.transform.position);
-
-        if (distanceToPlayer < 5)
+        try
         {
-            Manager.objectiveTime += pickupTime;
-            Destroy(this.gameObject);
-        }
+            this.transform.LookAt(player.transform);
 
+            float distanceToPlayer = Vector3.Distance(this.transform.position, player.transform.position);
+
+            if (distanceToPlayer < 5)
+            {
+                Manager.objectiveTime += pickupTime;
+                Destroy(this.gameObject);
+            }
+        }
+        catch (NullReferenceException ex)
+        {
+            Debug.Log($"Player no longer exists, this your error: {ex}");
+
+        }
     }
 }
