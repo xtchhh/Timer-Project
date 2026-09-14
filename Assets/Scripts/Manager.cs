@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using Random = UnityEngine.Random;
 using UnityEngine;
+using TMPro;
 using UnityEngine.SceneManagement;
 
 public class Manager : MonoBehaviour
@@ -9,8 +10,11 @@ public class Manager : MonoBehaviour
     public GameObject player;
     public GameObject objective;
     public GameObject pickup;
-    public static float objectiveTime = 15f;
-    private float endDistance = 5f;
+    public TMP_Text engineStartText;
+    public TMP_Text objectiveText;
+    public TMP_Text objectiveTimerText;
+    public static float gameTime = 25f;
+    private float endDistance = 10f;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -23,23 +27,33 @@ public class Manager : MonoBehaviour
     {
         ObjectiveDistance();
         DestroyCheck();
+        GameText();
     }
 
     void ObjectiveDistance()
     {
         try
         {
-            Debug.Log($"{Time.time} + {objectiveTime}");
+            //Debug.Log($"{gameTime} + {gameTime}");
             float distanceToPlayer = Vector3.Distance(objective.gameObject.transform.position, player.transform.position);
+            
+            if (TestMove.canRide == true)
+            {
+                gameTime -= Time.deltaTime;
+            }
 
             if (distanceToPlayer < endDistance)
             {
-                Debug.Log($"Game Over because you reached objective, you won at {Time.time} seconds");
+                gameTime = 25f;
+                TestMove.canRide = false;
+                SceneManager.LoadScene("Win");
             }
 
-            if (Time.time >= objectiveTime)
+            if (gameTime <= 0)
             {
-                Debug.Log("Game Over because you ran out of time");
+                gameTime = 25f;
+                TestMove.canRide = false;
+                SceneManager.LoadScene("Loss");
             }
         }
         catch (NullReferenceException ex)
@@ -60,6 +74,7 @@ public class Manager : MonoBehaviour
     {
         yield return new WaitForSeconds(3.0f);
 
+        gameTime = 25f;
         SceneManager.LoadScene("Menu");
     }
     void SpawnPickup()
@@ -68,5 +83,21 @@ public class Manager : MonoBehaviour
         float randomZ = Random.Range(980, 30);
 
         Instantiate(pickup, new Vector3(randomX, 1, randomZ), Quaternion.identity);
+    }
+
+    void GameText()
+    {
+        if (TestMove.canRide == true)
+        {
+            engineStartText.enabled = false;
+            objectiveText.enabled = true;
+            objectiveTimerText.enabled = true;
+
+            objectiveTimerText.text = $"You have {Math.Round(gameTime),0} seconds";
+            if (gameTime < 20f)
+            {
+                objectiveText.enabled = false;
+            }
+        }
     }
 }

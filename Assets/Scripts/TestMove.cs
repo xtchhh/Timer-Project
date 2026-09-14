@@ -7,16 +7,18 @@ public class TestMove : MonoBehaviour
     private CharacterController characterController;
     public InputSystem_Actions inputActions;
     public GameObject explosion;
-    public float moveSpeed;
+    public AudioSource engine;
+    public AudioSource gearShift;
+    public AudioSource howl;
+    public AudioSource explosionSound;
+    private float moveSpeed;
     private float gravity = -9.41f;
-    private int health = 2;
-    public int damage;
-    //private float gravityMultiplier = 1.75f;
     private bool grounded;
+    private bool canPress = true;
+    public static bool canRide = false;
     private Vector3 velocity;
-    private Vector2 move; //x, y
+    private Vector2 move;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         characterController = GetComponent<CharacterController>();
@@ -29,7 +31,6 @@ public class TestMove : MonoBehaviour
         inputActions.Disable();
     }
 
-    // Update is called once per frame
     void Update()
     {
         Movement();
@@ -44,18 +45,37 @@ public class TestMove : MonoBehaviour
         cameraForward.y = 0;
         cameraForward = cameraForward.normalized;
 
-        if (move.sqrMagnitude > 0.1)
+        if (Keyboard.current.eKey.wasPressedThisFrame && canPress)
         {
-            moveSpeed = 40.0f;
+            canRide = true;
+            canPress = false;
+            
+            engine.volume = 1f;
+            howl.volume = 1f;
+            gearShift.volume = 1f;
+            gearShift.Play();
+            engine.Play();
+        }
+
+        if (canRide == true)
+        {
+            moveSpeed = 25f;
+            engine.pitch = 1f;
+
+            if (move.y >= 1)
+            {
+                engine.pitch = 1.25f;
+                moveSpeed = 50f;
+                howl.Play();
+                gearShift.Play();
+            }
 
             if (move.y == -1)
             {
-                moveSpeed = 5.0f;
+                moveSpeed = 15f;
+                engine.pitch = 0.75f;
+                gearShift.Play();
             }
-        }
-        else
-        {
-            moveSpeed = 15.0f;
         }
 
         Vector3 direction = (cameraForward * moveSpeed) + (velocity.y * Vector3.up);
@@ -115,9 +135,16 @@ public class TestMove : MonoBehaviour
 
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        if (hit.point.y >= 1f)
+        if (hit.point.y > 0.8f)
         {
+            canRide = false;
             this.gameObject.SetActive(false);
+
+            explosionSound.Play();
+            engine.volume = 0f;
+            howl.volume = 0f;
+            gearShift.volume = 0f;
+
             Instantiate(explosion, hit.point, Quaternion.identity);
         }
     }
@@ -133,13 +160,6 @@ public class TestMove : MonoBehaviour
         else
         {
             velocity.y += gravity * Time.deltaTime;
-
-            /*
-            if (characterController.velocity.y < 0)
-            {
-                velocity.y += gravity * gravityMultiplier * Time.deltaTime;
-            }
-            */
         }
     }
 }

@@ -4,12 +4,14 @@ using UnityEngine;
 public class Pickup : MonoBehaviour
 {
     private GameObject player;
+    private AudioSource pickpSound;
     private float pickupTime = 2.5f;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         player = GameObject.Find("Player");
+        pickpSound = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -23,7 +25,8 @@ public class Pickup : MonoBehaviour
 
             if (distanceToPlayer < 5)
             {
-                Manager.objectiveTime += pickupTime;
+                pickpSound.PlayDelayed(0.5f);
+                Manager.gameTime += pickupTime;
                 Destroy(this.gameObject);
             }
         }
