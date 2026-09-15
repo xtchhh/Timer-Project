@@ -4,6 +4,8 @@ using Random = UnityEngine.Random;
 using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
+using System.Collections.Generic;
+using Unity.VisualScripting;
 
 public class Manager : MonoBehaviour
 {
@@ -13,6 +15,7 @@ public class Manager : MonoBehaviour
     public TMP_Text engineStartText;
     public TMP_Text objectiveText;
     public TMP_Text objectiveTimerText;
+    public List<GameObject> pickupList = new List<GameObject>();
     public static float gameTime = 25f;
     private float endDistance = 10f;
 
@@ -20,6 +23,7 @@ public class Manager : MonoBehaviour
     void Start()
     {
         InvokeRepeating("SpawnPickup", 3.0f, 3.0f);
+        Cursor.lockState = CursorLockMode.Locked; //locked to window, wont try to escape into other window
     }
 
     // Update is called once per frame
@@ -34,7 +38,6 @@ public class Manager : MonoBehaviour
     {
         try
         {
-            //Debug.Log($"{gameTime} + {gameTime}");
             float distanceToPlayer = Vector3.Distance(objective.gameObject.transform.position, player.transform.position);
             
             if (TestMove.canRide == true)
